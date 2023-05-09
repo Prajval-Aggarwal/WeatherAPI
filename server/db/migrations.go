@@ -13,7 +13,7 @@ func AutoMigrateDatabase(db *gorm.DB) {
 	// }
 	// fmt.Println("db version is:", dbVersion.Version)
 	// if dbVersion.Version < 1 {
-	// 	err := db.AutoMigrate(&model.User{}, &model.GymEmp{}, &model.Payment{}, &model.Subscription{}, &model.Membership{}, &model.Equipment{}, &model.UAttendence{}, &model.EmpAttendence{}, &model.EmpTypes{} , &model.BlackListedToken{})
+	// 	err := db.AutoMigrate(&model.Player{}, &model.DailyReward{}, &model.PlayerCoins{}, &model.Session{}, &model.PowerUp{}, &model.PlayerCoins{}, model.PlayerPowerUps{}, model.ResetSession{})
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}
@@ -23,8 +23,7 @@ func AutoMigrateDatabase(db *gorm.DB) {
 	// 	dbVersion.Version = 1
 	// }
 	// if dbVersion.Version < 2 {
-	// 	err := db.AutoMigrate(&model.Slot{})
-
+	// 	err := db.AutoMigrate(&model.Cart{}, &model.Payment{}, &model.CartItem{}, &model.PlayerPayment{})
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}
@@ -32,10 +31,9 @@ func AutoMigrateDatabase(db *gorm.DB) {
 	// 		Version: 2,
 	// 	})
 	// 	dbVersion.Version = 2
-
 	// }
 	// if dbVersion.Version < 3 {
-	// 	err := db.AutoMigrate(&model.Credential{})
+	// 	err := db.AutoMigrate(&model.Avatar{}, model.PlayerAvatar{})
 	// 	if err != nil {
 	// 		panic(err)
 	// 	}

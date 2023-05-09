@@ -22,13 +22,6 @@ func main() {
 	connection := db.InitDB()
 	db.Transfer(connection)
 
-	// defer func() {
-		
-	// 	if err := connection.DB().Close(); err != nil {
-	// 		log.Print(err)
-	// 	}
-	// }()
-
 	app := server.NewServer(connection)
 	server.ConfigureRoutes(app)
 

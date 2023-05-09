@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -35,8 +37,8 @@ func UpdateRecord(data interface{}, id interface{}, columName string) *gorm.DB {
 	return result
 }
 
-func QueryExecutor(query string, data interface{}, args ...interface{}) error {
-
+func RawQuery(query string, data interface{}, args ...interface{}) error {
+	fmt.Println("query is ", query)
 	err := db.Raw(query, args...).Scan(data).Error
 	if err != nil {
 		return err
@@ -46,6 +48,13 @@ func QueryExecutor(query string, data interface{}, args ...interface{}) error {
 	return nil
 }
 
+func ExecuteQuery(query string, args ...interface{}) error {
+	err := db.Exec(query, args...).Error
+	if err != nil {
+		return err
+	}
+	return nil
+}
 func DeleteRecord(data interface{}, id interface{}, columName string) error {
 	column := columName + "=?"
 	result := db.Where(column, id).Delete(data)
@@ -56,9 +65,9 @@ func DeleteRecord(data interface{}, id interface{}, columName string) error {
 
 }
 
-func RecordExist(tableName string, phoneNumber string) bool {
+func RecordExist(tableName string, columnName string, value string) bool {
 	var exists bool
-	query := "SELECT EXISTS(SELECT * FROM " + tableName + " WHERE contact='" + phoneNumber + "')"
+	query := "SELECT EXISTS(SELECT * FROM " + tableName + " WHERE " + columnName + " = '" + value + "')"
 	db.Raw(query).Scan(&exists)
 	return exists
 }
