@@ -1,17 +1,12 @@
 package services
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"io"
 	"main/server/model"
 	"main/server/response"
 	"main/server/utils"
-	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,37 +20,16 @@ func GetCoordinates(params url.Values) (*[]model.ResponseCoordinate, error) {
 		if key == "start" || key == "end" {
 			continue
 		}
-		split := strings.Split(v[0], ",")
-		city := split[0]
-		state := split[1]
+		fmt.Println("v is ", v)
+		city := v[0]
+
 		fmt.Println("city is", city)
-		fmt.Println("state is:", state)
+		var singleCord model.Coordinate
 
 		apiUrl := fmt.Sprintf("https://trueway-geocoding.p.rapidapi.com/Geocode?address=%s", city)
-		req, err := http.NewRequest("GET", apiUrl, nil)
-		if err != nil {
-			return nil, errors.New("failed to make API call")
-		}
-		req.Header.Add("X-RapidAPI-Key", "877d7321bdmsh5db7b7a54b66d8fp168429jsn4835e587d80e")
-		req.Header.Add("X-RapidAPI-Host", "trueway-geocoding.p.rapidapi.com")
 
-		res, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return nil, err
-		}
-		defer res.Body.Close()
+		utils.RapidApiCall(apiUrl, &singleCord, "trueway-geocoding.p.rapidapi.com")
 
-		// Read the response body
-		body, err := io.ReadAll(res.Body)
-		if err != nil {
-			return nil, errors.New("failed to read response body")
-		}
-		var singleCord model.Coordinate
-		err = json.Unmarshal(body, &singleCord)
-		if err != nil {
-			fmt.Println("error is:", err)
-			return nil, err
-		}
 		tempResponse := model.ResponseCoordinate{
 			Name:      singleCord.Res[0].Address,
 			Latitude:  singleCord.Res[0].Location.Latitude,
@@ -69,25 +43,12 @@ func GetCoordinates(params url.Values) (*[]model.ResponseCoordinate, error) {
 
 func ExtractingData(Latitude float64, Longitude float64, startDate string, endDate string, Period string) (*model.CityInfo, error) {
 	var data model.CityInfo
-	apiUrl := fmt.Sprintf("https://meteostat.p.rapidapi.com/point/%s?lat=%v&lon=%v&start=%v&end=%v", Period, Latitude, Longitude, startDate, endDate)
+	apiUrl := fmt.Sprintf("https://meteostat.p.rapidapi.com/point/%s?lat=%v&lon=%v&start=%v&end=%v&alt=1", Period, Latitude, Longitude, startDate, endDate)
 
 	fmt.Println("apiUrl", apiUrl)
-	req, _ := http.NewRequest("GET", apiUrl, nil)
 
-	req.Header.Add("X-RapidAPI-Key", "877d7321bdmsh5db7b7a54b66d8fp168429jsn4835e587d80e")
-	req.Header.Add("X-RapidAPI-Host", "meteostat.p.rapidapi.com")
+	utils.RapidApiCall(apiUrl, &data, "meteostat.p.rapidapi.com")
 
-	res, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer res.Body.Close()
-	body, _ := io.ReadAll(res.Body)
-
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		return nil, err
-	}
 	return &data, nil
 
 }
@@ -121,7 +82,7 @@ func Daily(ctx *gin.Context) {
 		}
 		totalData = append(totalData, tempData)
 	}
-	response.ShowResponse("Success", 200, "Data fetched successfully", totalData, ctx)
+	response.ShowResponse("Success", 200, "Daily fetched successfully", totalData, ctx)
 }
 
 func Weekly(ctx *gin.Context) {
@@ -171,7 +132,7 @@ func Weekly(ctx *gin.Context) {
 		DataSlice = append(DataSlice, monthly)
 
 	}
-	response.ShowResponse("Success", 200, "Data fetched successfully", DataSlice, ctx)
+	response.ShowResponse("Success", 200, "Weekly fetched successfully", DataSlice, ctx)
 }
 
 func Monthly(ctx *gin.Context) {
@@ -202,7 +163,7 @@ func Monthly(ctx *gin.Context) {
 		totalData = append(totalData, tempData)
 
 	}
-	response.ShowResponse("Success", 200, "Data fetched successfully", totalData, ctx)
+	response.ShowResponse("Success", 200, "Monthly fetched successfully", totalData, ctx)
 }
 
 func Yearly(ctx *gin.Context) {
@@ -255,5 +216,5 @@ func Yearly(ctx *gin.Context) {
 		DataSlice = append(DataSlice, yearly)
 
 	}
-	response.ShowResponse("Success", 200, "Data fetched successfully", DataSlice, ctx)
+	response.ShowResponse("Success", 200, "Yearly fetched successfully", DataSlice, ctx)
 }
