@@ -22,7 +22,7 @@ func RapidApiCall(apiUrl string, data interface{}, host string) error {
 	}
 	req.Header.Add("X-RapidAPI-Key", "877d7321bdmsh5db7b7a54b66d8fp168429jsn4835e587d80e")
 	req.Header.Add("X-RapidAPI-Host", host)
-
+	fmt.Println("sdfjkd", req.Header.Get("X-RapidAPI-Host"))
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return err

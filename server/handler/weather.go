@@ -8,6 +8,7 @@ import (
 
 func DailyHandler(ctx *gin.Context) {
 	services.Daily(ctx)
+
 }
 func WeeklyHandler(ctx *gin.Context) {
 	services.Weekly(ctx)
