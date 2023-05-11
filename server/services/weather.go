@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log"
 	"main/server/model"
+	"main/server/request"
 	"main/server/response"
 	"main/server/utils"
-	"net/url"
 	"strconv"
 	"sync"
 	"time"
@@ -17,17 +17,11 @@ import (
 var wg = sync.WaitGroup{}
 var mut = sync.Mutex{}
 
-func GetCoordinates(params url.Values) (*[]model.ResponseCoordinate, error) {
+func GetCoordinates(cities []string) (*[]model.ResponseCoordinate, error) {
 	//params := c.Request.URL.Query()
 	//	fmt.Println("params is", params)
 	var coordinates []model.ResponseCoordinate
-	for key, v := range params {
-
-		if key == "start" || key == "end" {
-			continue
-		}
-		//fmt.Println("v is ", v)
-		city := v[0]
+	for _, city := range cities {
 
 		//fmt.Println("city is", city)
 		var singleCord model.Coordinate
@@ -63,20 +57,20 @@ func ExtractingData(Latitude float64, Longitude float64, startDate string, endDa
 	return &data, nil
 
 }
-func Daily(ctx *gin.Context) {
+func Daily(ctx *gin.Context, weatherRequest request.WeatherRequest) {
 
 	start := time.Now()
 
 	//get data from params
-	params := ctx.Request.URL.Query()
+	cities := weatherRequest.City
 	//fmt.Println("params is:", params)
 	var totalData []model.Data
 	//get start and end date from params'
 
-	startDate := params.Get("start")
-	endDate := params.Get("end")
+	startDate := weatherRequest.StartDate
+	endDate := weatherRequest.EndDate
 	//first get the coordinates
-	coordinates, err := GetCoordinates(params)
+	coordinates, err := GetCoordinates(cities)
 
 	if err != nil {
 		response.ErrorResponse(ctx, 400, err.Error())
@@ -105,16 +99,16 @@ func Daily(ctx *gin.Context) {
 	log.Printf("Binomial took %s", elapsed)
 	response.ShowResponse("Success", 200, "Daily fetched successfully", totalData, ctx)
 }
-func Weekly(ctx *gin.Context) {
-	//get data from params
-	params := ctx.Request.URL.Query()
+func Weekly(ctx *gin.Context, weatherRequest request.WeatherRequest) {
+
+	cities := weatherRequest.City
 	//fmt.Println("params is:", params)
 	//get start and end date from params'
 	var DataSlice []model.GroupData
-	startDate := params.Get("start")
-	endDate := params.Get("end")
+	startDate := weatherRequest.StartDate
+	endDate := weatherRequest.EndDate
 	//first get the coordinates
-	coordinates, err := GetCoordinates(params)
+	coordinates, err := GetCoordinates(cities)
 
 	if err != nil {
 		response.ErrorResponse(ctx, 400, err.Error())
@@ -146,7 +140,7 @@ func Weekly(ctx *gin.Context) {
 				tempAvg = tempAdd / 7
 				temp := model.TempData{
 					Name:    "Week" + strconv.Itoa(counter),
-					TempAvg: utils.RoundFloat(tempAvg, 3),
+					TempAvg: utils.RoundFloat(tempAvg, 1),
 				}
 				tempSLice = append(tempSLice, temp)
 				counter++
@@ -165,16 +159,16 @@ func Weekly(ctx *gin.Context) {
 	response.ShowResponse("Success", 200, "Weekly fetched successfully", DataSlice, ctx)
 }
 
-func Monthly(ctx *gin.Context) {
-	params := ctx.Request.URL.Query()
+func Monthly(ctx *gin.Context, weatherRequest request.WeatherRequest) {
+	cities := weatherRequest.City
 	//fmt.Println("params is:", params)
 	var totalData []model.Data
 	//get start and end date from params'
 
-	startDate := params.Get("start")
-	endDate := params.Get("end")
+	startDate := weatherRequest.StartDate
+	endDate := weatherRequest.EndDate
 	//first get the coordinates
-	coordinates, err := GetCoordinates(params)
+	coordinates, err := GetCoordinates(cities)
 	//fmt.Println("coordinates is", coordinates)
 	if err != nil {
 		response.ErrorResponse(ctx, 400, err.Error())
@@ -201,17 +195,17 @@ func Monthly(ctx *gin.Context) {
 	response.ShowResponse("Success", 200, "Monthly fetched successfully", totalData, ctx)
 }
 
-func Yearly(ctx *gin.Context) {
+func Yearly(ctx *gin.Context, weatherRequest request.WeatherRequest) {
 	//get data from params
-	params := ctx.Request.URL.Query()
+	cities := weatherRequest.City
 	//fmt.Println("params is:", params)
 	//get start and end date from params'
 
 	var DataSlice []model.GroupData
-	startDate := params.Get("start")
-	endDate := params.Get("end")
+	startDate := weatherRequest.StartDate
+	endDate := weatherRequest.EndDate
 	//first get the coordinates
-	coordinates, err := GetCoordinates(params)
+	coordinates, err := GetCoordinates(cities)
 
 	if err != nil {
 		response.ErrorResponse(ctx, 400, err.Error())
@@ -239,7 +233,7 @@ func Yearly(ctx *gin.Context) {
 
 				temp := model.TempData{
 					Name:    "Year " + strconv.Itoa(counter),
-					TempAvg: utils.RoundFloat(tempAvg, 3),
+					TempAvg: utils.RoundFloat(tempAvg, 1),
 				}
 				tempSLice = append(tempSLice, temp)
 				counter++

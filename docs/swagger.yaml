@@ -1,8 +1,137 @@
-basePath: /
+basePath: /api
+definitions:
+  request.WeatherRequest:
+    properties:
+      cities:
+        items:
+          type: string
+        type: array
+      end:
+        type: string
+      start:
+        type: string
+    type: object
+  response.Error:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  response.Success:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+      status:
+        type: string
+    type: object
 info:
   contact: {}
   description: This is a demo version of Gin app.
-  title: Gin Demo App
+  title: Weather API
   version: "1.0"
-paths: {}
+paths:
+  /daily:
+    post:
+      consumes:
+      - application/json
+      description: Show the daily historical data from start date to end date
+      parameters:
+      - description: Weather Details
+        in: body
+        name: weatherDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.WeatherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+      tags:
+      - Weather
+  /monthly:
+    post:
+      consumes:
+      - application/json
+      description: Show the monthly historical data from start date to end date
+      parameters:
+      - description: Weather De
+        in: body
+        name: weatherDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.WeatherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+      tags:
+      - Weather
+  /weekly:
+    post:
+      consumes:
+      - application/json
+      description: Show the weekly historical data from start date to end date
+      parameters:
+      - description: Weather De
+        in: body
+        name: weatherDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.WeatherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+      tags:
+      - Weather
+  /yearly:
+    post:
+      consumes:
+      - application/json
+      description: Show the yearly historical data from start date to end date
+      parameters:
+      - description: Weather De
+        in: body
+        name: weatherDetails
+        required: true
+        schema:
+          $ref: '#/definitions/request.WeatherRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Success'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Error'
+      tags:
+      - Weather
 swagger: "2.0"

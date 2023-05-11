@@ -10,10 +10,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// @title Gin Demo App
+// @title Weather API
 // @version 1.0
 // @description This is a demo version of Gin app.
-// @BasePath /
+// @BasePath /api
 func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
